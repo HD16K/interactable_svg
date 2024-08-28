@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:interactable_svg/interactable_svg/interactable_svg.dart';
-
+import 'package:interactive_svg_widget/interactive_svg/interactive_svg_widget.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -31,7 +30,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-final GlobalKey<InteractableSvgState> mapKey = GlobalKey();
+final GlobalKey<InteractiveSVGWidgetState> mapKey = GlobalKey();
 
 class _MyHomePageState extends State<MyHomePage> {
   Region? selectedRegion;
@@ -53,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
               scaleEnabled: true,
               panEnabled: true,
               constrained: true,
-              child: InteractableSvg(
+              child: InteractiveSVGWidget(
                 key: mapKey,
                 svgAddress: "assets/floor_map.svg",
                 onChanged: (region) {

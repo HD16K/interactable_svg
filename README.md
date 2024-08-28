@@ -1,8 +1,4 @@
-# interactable SVG
-
-A flutter package for interacting with different parts of an SVG.
-
-![example](https://user-images.githubusercontent.com/43154747/208787228-6dda3327-585d-4bae-a099-ad2b6f9170ed.gif)
+# interactive SVG widget
 
 ## Getting Started
 
@@ -11,13 +7,13 @@ In the `pubspec.yaml` of your **Flutter** project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  interactable_svg: any
+  interactive_svg_widget: any
 ```
 
 In your library file add the following import:
 
 ```dart
-import 'package:interactable_svg/interactable_svg/interactable_svg.dart';
+
 ```
 
 ## Usage
@@ -29,7 +25,7 @@ Basic usage (rendering SVG from asset folder):
           scaleEnabled: true,
           panEnabled: true,
           constrained: true,
-          child:InteractableSvg(
+          child:InteractiveSVGWidget(
             svgAddress: "assets/floor_map.svg",
             onChanged: (region) {
               setState(() {
@@ -59,7 +55,7 @@ Basic usage (rendering SVG from asset folder):
 Network usage (rendering SVG from an URL):
 
 ```dart
-          InteractableSvg.network(
+          InteractiveSVGWidget.network(
             svgAddress: "www.example.com",
             fileName: "/floor_map.svg",
             .
@@ -71,7 +67,7 @@ Network usage (rendering SVG from an URL):
 String usage (rendering SVG from a String):
 
 ```dart
-          InteractableSvg.string(
+          InteractiveSVGWidget.string(
             svgAddress: "<svg> </svg>",
           
             .
@@ -83,8 +79,8 @@ String usage (rendering SVG from a String):
 To select a region without clicking on the SVG see the below code. For better understanding check the example.
 
 ```dart
-final GlobalKey<InteractableSvgState> key = GlobalKey();
-InteractableSvg(
+final GlobalKey<InteractiveSVGWidgetState> key = GlobalKey();
+InteractiveSVGWidget(
       key: mapKey,...)
 
 key.currentState?.toggleButton(region);
@@ -122,10 +118,10 @@ for example:
 | onChanged                | `Function(Region? region)` |                   Returns new region value when it changed                   |
 | unSelectableId           |         `String?`          |                  Makes that region wi that id non selective                  |
 | centerDotEnable          |          `bool?`           |                   place a dot in the center of the region                    |
-| **FIXED** centerTextEnable |          `bool`           |             place name of the region at the center of the region             |
-| **UPDATED** textStyle    |        `TextStyle?`        |                         Style of name of the region                          |
+| \***FIXED**\* centerTextEnable |          `bool`           |             place name of the region at the center of the region             |
+| \***UPDATED**\* textStyle    |        `TextStyle?`        |                         Style of name of the region                          |
 | dotColor                 |          `Color?`          |                 Color of the dot in the center of the region                 |
-| **NEW** regionColors     |   `Map<String, Color>?`    | Set Color for region by using as key class property (in svg) of path element |
+| \***NEW**\* regionColors     |   `Map<String, Color>?`    | Set Color for region by using as key class property (in svg) of path element |
 
 ## Authors
 

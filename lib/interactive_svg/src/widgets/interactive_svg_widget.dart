@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import './region_painter.dart';
+import 'region_painter.dart';
 import '../models/region.dart';
 import '../parser.dart';
 import '../size_controller.dart';
 
-class InteractableSvg extends StatefulWidget {
+class InteractiveSVGWidget extends StatefulWidget {
   final bool _isFromWeb;
   final bool _isString;
   final double? width;
@@ -26,7 +26,7 @@ class InteractableSvg extends StatefulWidget {
   /// The key is name of class in the svg
   final Map<String, Color>? regionColors;
 
-  const InteractableSvg({
+  const InteractiveSVGWidget({
     super.key,
     required this.svgAddress,
     required this.onChanged,
@@ -47,7 +47,7 @@ class InteractableSvg extends StatefulWidget {
         _isString = false,
         fileName = "";
 
-  const InteractableSvg.network(
+  const InteractiveSVGWidget.network(
       {required this.fileName,
       super.key,
       required this.svgAddress,
@@ -68,7 +68,7 @@ class InteractableSvg extends StatefulWidget {
       : _isFromWeb = true,
         _isString = false;
 
-  const InteractableSvg.string(
+  const InteractiveSVGWidget.string(
       {super.key,
       required this.svgAddress,
       required this.onChanged,
@@ -90,10 +90,10 @@ class InteractableSvg extends StatefulWidget {
         fileName = "";
 
   @override
-  InteractableSvgState createState() => InteractableSvgState();
+  InteractiveSVGWidgetState createState() => InteractiveSVGWidgetState();
 }
 
-class InteractableSvgState extends State<InteractableSvg> {
+class InteractiveSVGWidgetState extends State<InteractiveSVGWidget> {
   final List<Region> _regionList = [];
 
   List<Region> selectedRegion = [];

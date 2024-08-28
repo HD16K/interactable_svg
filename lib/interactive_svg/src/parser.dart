@@ -1,10 +1,10 @@
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:interactable_svg/interactable_svg/src/utils/utils.dart';
+import 'package:interactive_svg_widget/interactive_svg/src/utils/utils.dart';
 import 'package:svg_path_parser/svg_path_parser.dart';
 
-import './size_controller.dart';
-import './constant.dart';
-import './models/region.dart';
+import 'size_controller.dart';
+import 'constant.dart';
+import 'models/region.dart';
 
 class Parser {
   static Parser? _instance;
