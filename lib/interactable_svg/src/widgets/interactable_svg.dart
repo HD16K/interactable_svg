@@ -19,12 +19,15 @@ class InteractableSvg extends StatefulWidget {
   final bool? toggleEnable;
   final String? unSelectableId;
   final bool? centerDotEnable;
-  final bool? centerTextEnable;
+  final bool centerTextEnable;
   final bool? isMultiSelectable;
   final TextStyle? centerTextStyle;
 
+  /// The key is name of class in the svg
+  final Map<String, Color>? regionColors;
+
   const InteractableSvg({
-    Key? key,
+    super.key,
     required this.svgAddress,
     required this.onChanged,
     this.width,
@@ -35,18 +38,18 @@ class InteractableSvg extends StatefulWidget {
     this.dotColor,
     this.unSelectableId,
     this.centerDotEnable,
-    this.centerTextEnable,
+    this.centerTextEnable = false,
     this.centerTextStyle,
     this.toggleEnable,
     this.isMultiSelectable,
+    this.regionColors,
   })  : _isFromWeb = false,
         _isString = false,
-        fileName = "",
-        super(key: key);
+        fileName = "";
 
   const InteractableSvg.network(
       {required this.fileName,
-      Key? key,
+      super.key,
       required this.svgAddress,
       required this.onChanged,
       this.width,
@@ -57,16 +60,16 @@ class InteractableSvg extends StatefulWidget {
       this.dotColor,
       this.unSelectableId,
       this.centerDotEnable,
-      this.centerTextEnable,
+      this.centerTextEnable = false,
       this.centerTextStyle,
       this.toggleEnable,
-      this.isMultiSelectable})
+      this.isMultiSelectable,
+      this.regionColors})
       : _isFromWeb = true,
-        _isString = false,
-        super(key: key);
+        _isString = false;
 
   const InteractableSvg.string(
-      {Key? key,
+      {super.key,
       required this.svgAddress,
       required this.onChanged,
       this.width,
@@ -77,14 +80,14 @@ class InteractableSvg extends StatefulWidget {
       this.dotColor,
       this.unSelectableId,
       this.centerDotEnable,
-      this.centerTextEnable,
+      this.centerTextEnable = false,
       this.centerTextStyle,
       this.toggleEnable,
-      this.isMultiSelectable})
+      this.isMultiSelectable,
+      this.regionColors})
       : _isFromWeb = false,
         _isString = true,
-        fileName = "",
-        super(key: key);
+        fileName = "";
 
   @override
   InteractableSvgState createState() => InteractableSvgState();
@@ -108,8 +111,7 @@ class InteractableSvgState extends State<InteractableSvg> {
   _loadRegionList() async {
     late final List<Region> list;
     if (widget._isFromWeb) {
-      list = await Parser.instance
-          .svgToRegionListNetwork(widget.svgAddress, widget.fileName);
+      list = await Parser.instance.svgToRegionListNetwork(widget.svgAddress, widget.fileName);
     } else if (widget._isString) {
       list = await Parser.instance.svgToRegionListString(widget.svgAddress);
     } else {
@@ -141,9 +143,7 @@ class InteractableSvgState extends State<InteractableSvg> {
   Widget _buildStackItem(Region region) {
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
-      onTap: () => (widget.toggleEnable ?? false)
-          ? toggleButton(region)
-          : holdButton(region),
+      onTap: () => (widget.toggleEnable ?? false) ? toggleButton(region) : holdButton(region),
       child: CustomPaint(
         isComplex: true,
         foregroundPainter: RegionPainter(
@@ -154,14 +154,15 @@ class InteractableSvgState extends State<InteractableSvg> {
             strokeColor: widget.strokeColor,
             centerDotEnable: widget.centerDotEnable,
             centerTextEnable: widget.centerTextEnable,
-            centerTextStyle: widget.centerTextStyle,
+            textStyle: widget.centerTextStyle,
             strokeWidth: widget.strokeWidth,
+            boxColor: widget.regionColors?[region.className],
             unSelectableId: widget.unSelectableId),
         child: Container(
+          //color: widget.regionColors?[region.className],
           width: widget.width ?? double.infinity,
           height: widget.height ?? double.infinity,
-          constraints: BoxConstraints(
-              maxWidth: mapSize?.width ?? 0, maxHeight: mapSize?.height ?? 0),
+          constraints: BoxConstraints(maxWidth: mapSize?.width ?? 0, maxHeight: mapSize?.height ?? 0),
           alignment: Alignment.center,
         ),
       ),

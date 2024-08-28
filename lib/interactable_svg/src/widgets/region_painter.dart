@@ -5,33 +5,32 @@ import '../size_controller.dart';
 
 class RegionPainter extends CustomPainter {
   final Region region;
-  // final Region? selectedRegion;
   final List<Region> selectedRegion;
   final Color? strokeColor;
   final Color? selectedColor;
   final Color? dotColor;
   final double? strokeWidth;
   final bool? centerDotEnable;
-  final bool? centerTextEnable;
-  final TextStyle? centerTextStyle;
+  final bool centerTextEnable;
+  final TextStyle? textStyle;
   final String? unSelectableId;
-
+  final Color? boxColor;
   final sizeController = SizeController.instance;
 
   double _scale = 1.0;
 
-  RegionPainter({
-    required this.region,
-    required this.selectedRegion,
-    this.selectedColor,
-    this.strokeColor,
-    this.dotColor,
-    this.centerDotEnable,
-    this.centerTextEnable,
-    this.centerTextStyle,
-    this.strokeWidth,
-    this.unSelectableId,
-  });
+  RegionPainter(
+      {required this.region,
+      required this.selectedRegion,
+      this.selectedColor,
+      this.strokeColor,
+      this.dotColor,
+      this.centerDotEnable,
+      this.centerTextEnable = false,
+      this.textStyle,
+      this.strokeWidth,
+      this.unSelectableId,
+      this.boxColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -39,6 +38,10 @@ class RegionPainter extends CustomPainter {
       ..color = strokeColor ?? Colors.black45
       ..strokeWidth = strokeWidth ?? 1.0
       ..style = PaintingStyle.stroke;
+    final boxPen = Paint()
+      ..color = boxColor ?? Colors.blue.shade500
+      ..strokeWidth = 3.0
+      ..style = PaintingStyle.fill;
 
     final selectedPen = Paint()
       ..color = selectedColor ?? Colors.blue
@@ -54,26 +57,29 @@ class RegionPainter extends CustomPainter {
 
     _scale = sizeController.calculateScale(size);
     canvas.scale(_scale);
-
+    if (boxColor != null) {
+      canvas.drawPath(region.path, boxPen);
+    }
     if (selectedRegion.contains(region)) {
       canvas.drawPath(region.path, selectedPen);
     }
     if ((centerDotEnable ?? false) && region.id != unSelectableId) {
       canvas.drawCircle(bounds.center, 3.0, redDot);
     }
-    if ((centerTextEnable ?? false) && region.id != unSelectableId) {
-      TextSpan span = TextSpan(
-          style: centerTextStyle ?? const TextStyle(color: Colors.black),
-          text: region.name);
+    if (region.id != unSelectableId) {
+      TextSpan span = TextSpan(style: textStyle ?? const TextStyle(color: Colors.black), text: region.name);
       TextPainter tp = TextPainter(
         text: span,
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
       );
       tp.layout();
-      tp.paint(canvas, bounds.center);
+      if (centerTextEnable) {
+        tp.paint(canvas, bounds.center.translate(-(tp.width / 2), 0));
+      } else {
+        tp.paint(canvas, bounds.center);
+      }
     }
-
     canvas.drawPath(region.path, pen);
   }
 

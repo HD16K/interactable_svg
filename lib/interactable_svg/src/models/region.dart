@@ -4,6 +4,6 @@ class Region {
   String id;
   String name;
   Path path;
-
-  Region({required this.id, required this.name, required this.path});
+  String? className;
+  Region({required this.id, required this.name, required this.path,required this.className});
 }

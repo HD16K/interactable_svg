@@ -1,19 +1,31 @@
+<!-- markdownlint-disable MD041 -->
+## 0.1.0
+
+* Fixed property centerTextEnable, now it actually center text
+* Renamed centerTextStyle -> textStyle
+* Added new property boxColor that allow to color each region separately using as keys class name (in svg) of path element
+* Updated dependencies and config files in example
+* Updated README, CHANGELOG and LICENSE
+
 ## 0.0.7
+
 * Updated the example
 
 ## 0.0.6
+
 * Updated http dependency to 1.1.0 to fix flutter web bug
+
 ## 0.0.5
+
 * Added  InteractableSvg.string
 
-
 ## 0.0.4
+
 * Added  InteractableSvg.network
 
-
 ## 0.0.3
-* Added access to toggleButton and holdButton in InteractableSvgState
 
+* Added access to toggleButton and holdButton in InteractableSvgState
 
 ## 0.0.2
 
