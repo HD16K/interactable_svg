@@ -2,13 +2,8 @@ import 'dart:ui';
 import 'models/region_area.dart';
 
 class SizeController {
-  static SizeController? _instance;
-
-  static SizeController get instance {
-    _instance ??= SizeController._init();
-    return _instance!;
-  }
-
+  static final SizeController _singleton = SizeController._init();
+  factory SizeController.instance() => _singleton;
   SizeController._init();
 
   final RegionAreaCustom _regionArea = RegionAreaCustom();

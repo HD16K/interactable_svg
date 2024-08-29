@@ -4,21 +4,18 @@ version: 0.1.0
 repository: https://github.com/HD16K/interactable_svg
 
 environment:
-  sdk: '>=2.18.2 <4.0.0'
-  flutter: ">=1.17.0"
+  sdk: '>=2.14.4 <4.0.0'
+  flutter: ">=2.5.3 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
   svg_path_parser: ^1.1.1
-  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
-
 
 
 

@@ -7,12 +7,13 @@ In the `pubspec.yaml` of your **Flutter** project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  interactive_svg_widget: any
+  interactive_svg_widget: ^0.1.2
 ```
 
 In your library file add the following import:
 
 ```dart
+import 'package:interactive_svg_widget/interactive_svg_widget.dart';
 
 ```
 
@@ -25,8 +26,8 @@ Basic usage (rendering SVG from asset folder):
           scaleEnabled: true,
           panEnabled: true,
           constrained: true,
-          child:InteractiveSVGWidget(
-            svgAddress: "assets/floor_map.svg",
+          child:InteractiveSVGWidget.asset(
+            svgAssetPath: "assets/floor_map.svg",
             onChanged: (region) {
               setState(() {
                 selectedRegion = region;
@@ -45,30 +46,18 @@ Basic usage (rendering SVG from asset folder):
             centerDotEnable:true ,
             centerTextEnable:true ,
             strokeWidth: 2.0,
-            centerTextStyle: const TextStyle(fontSize: 12,color: Colors.black),
+            textStyle: const TextStyle(fontSize: 12,color: Colors.black),
 
 
           ),
         )
 ```
 
-Network usage (rendering SVG from an URL):
-
-```dart
-          InteractiveSVGWidget.network(
-            svgAddress: "www.example.com",
-            fileName: "/floor_map.svg",
-            .
-            .
-          ),
-        
-```
-
 String usage (rendering SVG from a String):
 
 ```dart
           InteractiveSVGWidget.string(
-            svgAddress: "<svg> </svg>",
+            svg: "<svg> </svg>",
           
             .
             .
@@ -98,30 +87,30 @@ Also your SVG must follow the following pattern.For better understanding see the
 ```
 
 for example:
-  \<path id="==118==" name="==room 9==" class="==st0==" d="==M55 508h101.26v330H55Z==" />;
+  \<path id="<mark>118</mark>" name="<mark>room 9</mark>" class="<mark>st0</mark>" d="<mark>M55 508h101.26v330H55Z</mark>" />;
 
 ---
 
 ## Properties
 
-| props                    |           types            |                                 description                                  |
-| :----------------------- | :------------------------: | :--------------------------------------------------------------------------: |
-| key                      |           `Key?`           |                                                                              |
-| svgAddress               |          `String`          |                Address of an SVG like  "assets/floor_map.svg"                |
-| width                    |         `double?`          |                 SVG width. Default value is double.infinity                  |
-| height                   |         `double?`          |                 SVG height. Default value is double.infinity                 |
-| strokeColor              |          `Color?`          |                         Color of the region borders                          |
-| selectedColor            |          `Color?`          |                         Color of the selected region                         |
-| strokeWidth              |         `double?`          |                         Width of the region borders                          |
-| toggleEnable             |          `bool?`           |                  Region selecting act as like toggle button                  |
-| isMultiSelectable        |          `bool?`           |                       select multiple regions at once                        |
-| onChanged                | `Function(Region? region)` |                   Returns new region value when it changed                   |
-| unSelectableId           |         `String?`          |                  Makes that region wi that id non selective                  |
-| centerDotEnable          |          `bool?`           |                   place a dot in the center of the region                    |
-| \***FIXED**\* centerTextEnable |          `bool`           |             place name of the region at the center of the region             |
-| \***UPDATED**\* textStyle    |        `TextStyle?`        |                         Style of name of the region                          |
-| dotColor                 |          `Color?`          |                 Color of the dot in the center of the region                 |
-| \***NEW**\* regionColors     |   `Map<String, Color>?`    | Set Color for region by using as key class property (in svg) of path element |
+| props             |             types              |                                 description                                  |
+| :---------------- | :----------------------------: | :--------------------------------------------------------------------------: |
+| key               |             `Key?`             |                                                                              |
+| svg/svgAssetPath  |            `String`            |                Address of an SVG like  "assets/floor_map.svg"                |
+| width             |           `double?`            |                 SVG width. Default value is double.infinity                  |
+| height            |           `double?`            |                 SVG height. Default value is double.infinity                 |
+| strokeColor       |            `Color?`            |                         Color of the region borders                          |
+| selectedColor     |            `Color?`            |                         Color of the selected region                         |
+| strokeWidth       |           `double?`            |                         Width of the region borders                          |
+| toggleEnable      |            `bool?`             |                  Region selecting act as like toggle button                  |
+| isMultiSelectable |             `bool`             |                       select multiple regions at once                        |
+| onChanged         | `void Function(Region region)` |                   Returns new region value when it changed                   |
+| unSelectableId    |           `String?`            |                  Makes that region wi that id non selective                  |
+| centerDotEnable   |             `bool`             |                   place a dot in the center of the region                    |
+| centerTextEnable  |             `bool`             |             place name of the region at the center of the region             |
+| textStyle         |          `TextStyle?`          |                         Style of name of the region                          |
+| dotColor          |            `Color?`            |                 Color of the dot in the center of the region                 |
+| regionColors      |     `Map<String, Color>?`      | Set Color for region by using as key class property (in svg) of path element |
 
 ## Authors
 

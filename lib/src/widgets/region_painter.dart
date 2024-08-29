@@ -5,32 +5,33 @@ import '../size_controller.dart';
 
 class RegionPainter extends CustomPainter {
   final Region region;
-  final List<Region> selectedRegion;
+  final List<Region> selectedRegions;
   final Color? strokeColor;
   final Color? selectedColor;
   final Color? dotColor;
   final double? strokeWidth;
-  final bool? centerDotEnable;
+  final bool centerDotEnable;
   final bool centerTextEnable;
   final TextStyle? textStyle;
   final String? unSelectableId;
   final Color? boxColor;
-  final sizeController = SizeController.instance;
+  final sizeController = SizeController.instance();
 
   double _scale = 1.0;
 
-  RegionPainter(
-      {required this.region,
-      required this.selectedRegion,
-      this.selectedColor,
-      this.strokeColor,
-      this.dotColor,
-      this.centerDotEnable,
-      this.centerTextEnable = false,
-      this.textStyle,
-      this.strokeWidth,
-      this.unSelectableId,
-      this.boxColor});
+  RegionPainter({
+    required this.region,
+    required this.selectedRegions,
+    this.selectedColor,
+    this.strokeColor,
+    this.dotColor,
+    this.centerDotEnable = false,
+    this.centerTextEnable = false,
+    this.textStyle,
+    this.strokeWidth,
+    this.unSelectableId,
+    this.boxColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -60,10 +61,10 @@ class RegionPainter extends CustomPainter {
     if (boxColor != null) {
       canvas.drawPath(region.path, boxPen);
     }
-    if (selectedRegion.contains(region)) {
+    if (selectedRegions.contains(region)) {
       canvas.drawPath(region.path, selectedPen);
     }
-    if ((centerDotEnable ?? false) && region.id != unSelectableId) {
+    if (centerDotEnable && region.id != unSelectableId) {
       canvas.drawCircle(bounds.center, 3.0, redDot);
     }
     if (region.id != unSelectableId) {

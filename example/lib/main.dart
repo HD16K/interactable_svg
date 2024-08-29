@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:interactive_svg_widget/interactive_svg/interactive_svg_widget.dart';
+import 'package:interactive_svg_widget/interactive_svg_widget.dart';
 void main() {
   runApp(const MyApp());
 }
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Key? key;
+  const MyApp({this.key}):super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +23,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({
-    super.key,
-  });
+  final Key? key;
+  const MyHomePage({this.key}):super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -52,9 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
               scaleEnabled: true,
               panEnabled: true,
               constrained: true,
-              child: InteractiveSVGWidget(
+              child: InteractiveSVGWidget.asset(
                 key: mapKey,
-                svgAddress: "assets/floor_map.svg",
+                svgAssetPath: "assets/floor_map.svg",
                 onChanged: (region) {
                   setState(() {
                     selectedRegion = region;
@@ -86,7 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             color: Colors.blue,
             child: const Text("select last selected room"),
-          )
+          ),
+          ListView()
         ],
       ),
     );
