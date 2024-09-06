@@ -1,7 +1,20 @@
 name: interactive_svg_widget
 description: Flutter package to interact with different regions of an SVG.
-version: 0.1.0
+version: 1.0.0
 repository: https://github.com/HD16K/interactable_svg
+issue_tracker: https://github.com/HD16K/interactable_svg/issues
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+topics: 
+  - svg
+  - widget
+  - flutter
+
 
 environment:
   sdk: '>=2.14.4 <4.0.0'

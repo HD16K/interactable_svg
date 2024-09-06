@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:interactive_svg_widget/interactive_svg_widget.dart';
+
 void main() {
   runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
-  final Key? key;
-  const MyApp({this.key}):super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  final Key? key;
-  const MyHomePage({this.key}):super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -45,49 +43,50 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Container(
             height: MediaQuery.of(context).size.height * 0.50,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                color: Colors.grey.withOpacity(0.2)),
+            decoration: BoxDecoration(border: Border.all(color: Colors.black), color: Colors.grey.withOpacity(0.2)),
             child: InteractiveViewer(
+              maxScale: 8,
               scaleEnabled: true,
               panEnabled: true,
               constrained: true,
               child: InteractiveSVGWidget.asset(
+                gestureDetectorData: (region) => GestureDetectorData(
+                  onLongPress: () async {
+                    await showDialog(
+                      context: context,
+                      builder: (context) => Dialog(child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text('Region you pressed on: ${region.name}'),
+                      ),)
+                    );
+                  },
+                ),
+                themeData: InteractiveSvgThemeData(
+                  dotColor: Colors.purple,
+                  selectedColor: Colors.teal.withOpacity(0.5),
+                  strokeColor: Colors.yellow,
+                  strokeWidth: 3.0,
+                  dotRadius: 6,
+                  textStyle: const TextStyle(fontSize: 12, color: Colors.black45),
+                ),
                 key: mapKey,
                 svgAssetPath: "assets/floor_map.svg",
-                onChanged: (region) {
+                onTap: (region) {
                   setState(() {
                     selectedRegion = region;
                   });
                 },
+                regionColors: const {"st0": Colors.amber},
                 width: double.infinity,
                 height: double.infinity,
-                toggleEnable: true,
                 isMultiSelectable: false,
-                dotColor: Colors.black,
-                selectedColor: Colors.red.withOpacity(0.5),
-                strokeColor: Colors.blue,
                 unSelectableId: "bg",
                 centerDotEnable: true,
                 centerTextEnable: true,
-                strokeWidth: 2.0,
-                centerTextStyle: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.black,
-                ),
               ),
             ),
           ),
-          MaterialButton(
-            onPressed: () {
-              if (selectedRegion != null) {
-                mapKey.currentState?.toggleButton(selectedRegion!);
-              }
-            },
-            color: Colors.blue,
-            child: const Text("select last selected room"),
-          ),
-          ListView()
+          Text('selected room: ${selectedRegion?.name}'),
         ],
       ),
     );

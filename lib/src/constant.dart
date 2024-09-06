@@ -1,3 +1,2 @@
-class Constants {
-  static const mapRegexp = '.* id="(.*)" name="(.*)".* class="(.*)".* d="(.*)"';
-}
+const mapRegexp = '.* id="(.*)" name="(.*)".* class="(.*)".* d="(.*)"';
+

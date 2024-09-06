@@ -1,4 +1,9 @@
-# interactive SVG widget
+<!-- markdownlint-disable MD033 MD041 -->
+
+A Flutter package that enables interaction with different regions of an SVG, allowing for a more engaging and dynamic user experience. It provides a way to define gesture detectors for specific regions of the SVG, making it possible to respond to user input and create interactive visualizations.
+
+> **IMPORTANT**
+> For now this package only uses \<path> in svg file see [regex](#regex) and svg file in *example/assets* on [github](https://github.com/HD16K/interactable_svg/tree/main/example/assets)
 
 ## Getting Started
 
@@ -7,80 +12,87 @@ In the `pubspec.yaml` of your **Flutter** project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  interactive_svg_widget: ^0.1.2
+  interactive_svg_widget: ^1.0.0
 ```
 
 In your library file add the following import:
 
 ```dart
 import 'package:interactive_svg_widget/interactive_svg_widget.dart';
-
 ```
 
 ## Usage
 
-Basic usage (rendering SVG from asset folder):
+By rendering SVG from asset folder:
 
 ```dart
-        InteractiveViewer(
-          scaleEnabled: true,
-          panEnabled: true,
-          constrained: true,
-          child:InteractiveSVGWidget.asset(
-            svgAssetPath: "assets/floor_map.svg",
-            onChanged: (region) {
-              setState(() {
-                selectedRegion = region;
-
-              });
-            },
-
-            width: double.infinity,
-            height: double.infinity,
-            toggleEnable: true,
-            isMultiSelectable: false,
-            dotColor: Colors.black,
-            selectedColor: Colors.red.withOpacity(0.5),
-            strokeColor: Colors.blue,
-            unSelectableId: "bg",
-            centerDotEnable:true ,
-            centerTextEnable:true ,
-            strokeWidth: 2.0,
-            textStyle: const TextStyle(fontSize: 12,color: Colors.black),
-
-
-          ),
-        )
+        InteractiveViewer( //<- It is very useful to use InteractiveViewer with this package
+              maxScale: 8,
+              scaleEnabled: true,
+              panEnabled: true,
+              constrained: true,
+              child: InteractiveSVGWidget.asset(
+                gestureDetectorData: (region) => GestureDetectorData(
+                  onLongPress: () {
+                    showAboutDialog(context: context, children: [
+                      Text('Region you pressed on: ${region.name}'),
+                    ]);
+                  },
+                ),
+                themeData: InteractiveSvgThemeData(
+                  dotColor: Colors.purple,
+                  selectedColor: Colors.teal.withOpacity(0.5),
+                  strokeColor: Colors.yellow,
+                  strokeWidth: 3.0,
+                  dotRadius: 6,
+                  textStyle: const TextStyle(fontSize: 12, color: Colors.black45),
+                ),
+                key: mapKey,
+                svgAssetPath: "assets/floor_map.svg",
+                onTap: (region) {
+                  setState(() {
+                    selectedRegion = region;
+                  });
+                },
+                regionColors: const {"st0": Colors.amber},
+                width: double.infinity,
+                height: double.infinity,
+                isMultiSelectable: false,
+                unSelectableId: "bg",
+                centerDotEnable: true,
+                centerTextEnable: true,
+              ),
+            ),
 ```
+
+![How package work example.mp4](https://github.com/HD16K/interactable_svg/tree/main/doc/example.mp4)
 
 String usage (rendering SVG from a String):
 
 ```dart
           InteractiveSVGWidget.string(
-            svg: "<svg> </svg>",
-          
-            .
-            .
+            svg: "<svg> ... </svg>",
+            ...
           ),
-        
 ```
 
-To select a region without clicking on the SVG see the below code. For better understanding check the example.
+---
+
+To select a region without clicking on the box or clear the selection see the below code.
 
 ```dart
-final GlobalKey<InteractiveSVGWidgetState> key = GlobalKey();
-InteractiveSVGWidget(
-      key: mapKey,...)
+final GlobalKey<InteractiveSVGWidgetState> mapKey = GlobalKey();
+InteractiveSVGWidget(key: mapKey,...)
 
-key.currentState?.toggleButton(region);
-key.currentState?.holdButton(region);
+mapKey.currentState?.toggleButton(region);
+mapKey.currentState?.clearSelect();
 ```
 
 ---
 
 ## Regex
 
-Also your SVG must follow the following pattern.For better understanding see the example SVG.
+Also your SVG must follow the following pattern. For better understanding see the [example SVG](https://github.com/HD16K/interactable_svg/tree/main/example/assets).
 
 ```regex
 '.* id="(.*)" name="(.*)".* class="(.*)".* d="(.*)"'
@@ -91,28 +103,11 @@ for example:
 
 ---
 
-## Properties
+## Contributing
 
-| props             |             types              |                                 description                                  |
-| :---------------- | :----------------------------: | :--------------------------------------------------------------------------: |
-| key               |             `Key?`             |                                                                              |
-| svg/svgAssetPath  |            `String`            |                Address of an SVG like  "assets/floor_map.svg"                |
-| width             |           `double?`            |                 SVG width. Default value is double.infinity                  |
-| height            |           `double?`            |                 SVG height. Default value is double.infinity                 |
-| strokeColor       |            `Color?`            |                         Color of the region borders                          |
-| selectedColor     |            `Color?`            |                         Color of the selected region                         |
-| strokeWidth       |           `double?`            |                         Width of the region borders                          |
-| toggleEnable      |            `bool?`             |                  Region selecting act as like toggle button                  |
-| isMultiSelectable |             `bool`             |                       select multiple regions at once                        |
-| onChanged         | `void Function(Region region)` |                   Returns new region value when it changed                   |
-| unSelectableId    |           `String?`            |                  Makes that region wi that id non selective                  |
-| centerDotEnable   |             `bool`             |                   place a dot in the center of the region                    |
-| centerTextEnable  |             `bool`             |             place name of the region at the center of the region             |
-| textStyle         |          `TextStyle?`          |                         Style of name of the region                          |
-| dotColor          |            `Color?`            |                 Color of the dot in the center of the region                 |
-| regionColors      |     `Map<String, Color>?`      | Set Color for region by using as key class property (in svg) of path element |
+Feel free to open an issue or submit a pull request. Also you can add request for a new feature in the [discussions](https://github.com/HD16K/interactable_svg/discussions/categories/ideas)
 
 ## Authors
 
-* Original package: [Hussein Copol](https://github.com/HusseinCopol)
 * Updated package: [HD16K](https://github.com/HD16K)
+* Original package: [Hussein Copol](https://github.com/HusseinCopol)

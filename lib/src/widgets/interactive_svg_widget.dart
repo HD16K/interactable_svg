@@ -1,69 +1,136 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../models/gesture_detector_data.dart';
+import '../models/interactive_svg_theme_data.dart';
 import '../models/region.dart';
 import '../parser.dart';
 import '../size_controller.dart';
 import 'region_painter.dart';
 
+/// A interactive widget that it is render from SVG file or string.
+///
+/// This widget is based on the [CustomPaint] widget and uses the [RegionPainter]
+/// to paint the regions of the SVG on the canvas.
+///
+/// The [InteractiveSVGWidget] widget is can bring to 'life' svg.
+/// By that it means that the svg elements (for now only `<path>`) can be interacted with.
+///
+/// Note: In widget tree it will be shown as [Container] due to fact that it is painted by [CustomPaint].
+///
+/// The best effect is to use InteractiveSVGWidget in combination with [InteractiveViewer].
+///
+/// Example:
+/// ```dart
+/// InteractiveViewer(
+///   maxScale: 8,
+///   scaleEnabled: true,
+///   panEnabled: true,
+///   constrained: true,
+///   child: InteractiveSVGWidget.asset(
+///     gestureDetectorData: GestureDetectorData(),
+///     themeData: InteractiveSvgThemeData(
+///       dotColor: Colors.blue,
+///       selectedColor: Colors.red.withOpacity(0.5),
+///       strokeColor: Colors.blue,
+///       strokeWidth: 2.0,
+///       textStyle: const TextStyle(fontSize: 12, color: Colors.black),
+///     ),
+///     key: mapKey,
+///     svgAssetPath: "assets/floor_map.svg",
+///     onChanged: (region) {
+///       setState(() {
+///         selectedRegion = region;
+///       });
+///     },
+///     toggleEnable: true,
+///     isMultiSelectable: false,
+///     unSelectableId: "bg",
+///     centerDotEnable: true,
+///     centerTextEnable: true,
+///   ),
+/// ),
+/// ```
 class InteractiveSVGWidget extends StatefulWidget {
-  final Key? key;
+  /// The set of settings used to configure the theme
+  final InteractiveSvgThemeData themeData;
+
+  /// Whether to paind the dot in the center of the region
   final bool centerDotEnable;
+
+  /// Whether to center the text in the center of the region
   final bool centerTextEnable;
-  final TextStyle? centerTextStyle;
-  final Color? dotColor;
-  final double? height;
+
+  /// The height of the widget
+  final double height;
+
+  /// The width of the widget
+  final double width;
+
+  /// Whether to allow multiple regions to be selected
   final bool isMultiSelectable;
-  final void Function(Region region) onChanged;
 
-  /// The key is name of class in the svg
+  /// A function that will be called whether a region is selected/unselected
+  final void Function(Region region) onTap;
+
+  ///The reason why this is a function is because it simplifies the creation of GestureDetector functions when you want to use the Region inside them
+  /// GestureDetectorData is a set of functions that can be used to customize the GestureDetector
+  final GestureDetectorData Function(Region region)? gestureDetectorData;
+
+  /// A Map where the key is the class name (in svg `<path class="">`) of the region and the value is the color of the region
+  /// Example: `{"down": Colors.red, "up": Colors.blue}`
   final Map<String, Color>? regionColors;
-
-  final Color? selectedColor;
-  final Color? strokeColor;
-  final double? strokeWidth;
   final String svgData;
-  final bool? toggleEnable;
-  final String? unSelectableId;
-  final double? width;
 
+  /// The id of the region that will not be selectable.
+  final String? unSelectableId;
+
+  /// Create an instance of [InteractiveSVGWidget] with the given [svgAssetPath].
+  ///
+  /// Example:
+  /// ```dart
+  /// svgAssetPath: "assets/floor_map.svg"
+  /// ```
   const InteractiveSVGWidget.asset({
-    this.key,
     required String svgAssetPath,
-    required this.onChanged,
-    this.width,
-    this.height,
-    this.strokeColor,
-    this.strokeWidth,
-    this.selectedColor,
-    this.dotColor,
+    required this.onTap,
+    this.gestureDetectorData,
+    Key? key,
+    this.width = double.infinity,
+    this.height = double.infinity,
+    this.themeData = const InteractiveSvgThemeData(),
     this.unSelectableId,
     this.centerDotEnable = false,
     this.centerTextEnable = true,
-    this.centerTextStyle,
-    this.toggleEnable,
-    this.isMultiSelectable = false,
     this.regionColors,
+    this.isMultiSelectable = false,
   })  : _isString = false,
         svgData = svgAssetPath,
         super(key: key);
 
+  /// Create an instance of [InteractiveSVGWidget] with the given [svg].
+  ///
+  /// Example:
+  /// ```dart
+  /// svg: '''<svg ...>
+  /// <path id="110" name="room 1" class="st0" d="M863.74 602h101.26v236H863.74Z" /> ;
+  /// ...
+  /// </svg>'''
+  /// ```
   const InteractiveSVGWidget.string({
-    this.key,
     required String svg,
-    required this.onChanged,
-    this.width,
-    this.height,
-    this.strokeColor,
-    this.strokeWidth,
-    this.selectedColor,
-    this.dotColor,
+    required this.onTap,
+    this.gestureDetectorData,
+    Key? key,
+    this.width = double.infinity,
+    this.height = double.infinity,
+    this.themeData = const InteractiveSvgThemeData(),
+    this.regionColors,
     this.unSelectableId,
     this.centerDotEnable = false,
     this.centerTextEnable = true,
-    this.centerTextStyle,
-    this.toggleEnable,
     this.isMultiSelectable = false,
-    this.regionColors,
   })  : _isString = true,
         svgData = svg,
         super(key: key);
@@ -75,110 +142,141 @@ class InteractiveSVGWidget extends StatefulWidget {
 }
 
 class InteractiveSVGWidgetState extends State<InteractiveSVGWidget> {
-  Size? mapSize;
-  List<Region> selectedRegion = [];
-
+  late final Size _mapSize;
+  final List<Region> _selectedRegions = [];
   final List<Region> _regionList = [];
-  final _sizeController = SizeController.instance();
 
+  final _sizeController = SizeController.instance();
+  List<Region> get selectedRegions => _selectedRegions;
+  Size get mapSize => _mapSize;
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      _loadRegionList();
-    });
+    _loadRegionList();
   }
 
   void clearSelect() {
+    setState(_selectedRegions.clear);
+  }
+
+  Future<void> _loadRegionList() async {
+    late final List<Region> list;
+    if (widget._isString) {
+      list = Parser.instance().svgToRegionListString(widget.svgData);
+    } else {
+      list = await Parser.instance().svgToRegionList(widget.svgData);
+    }
     setState(() {
-      selectedRegion.clear();
+      _regionList
+        ..clear()
+        ..addAll(list);
+      _mapSize = _sizeController.mapSize;
     });
   }
 
   void toggleButton(Region region) {
     if (region.id != widget.unSelectableId) {
       setState(() {
-        if (selectedRegion.contains(region)) {
-          selectedRegion.remove(region);
+        if (_selectedRegions.contains(region)) {
+          _selectedRegions.remove(region);
         } else {
           if (widget.isMultiSelectable) {
-            selectedRegion.add(region);
+            _selectedRegions.add(region);
           } else {
-            selectedRegion.clear();
-            selectedRegion.add(region);
+            _selectedRegions
+              ..clear()
+              ..add(region);
           }
         }
-        widget.onChanged(region);
+        widget.onTap(region);
       });
     }
-  }
-
-  void holdButton(Region region) {
-    if (region.id != widget.unSelectableId) {
-      setState(() {
-        if (widget.isMultiSelectable) {
-          selectedRegion.add(region);
-          widget.onChanged.call(region);
-        } else {
-          selectedRegion.clear();
-          selectedRegion.add(region);
-
-          widget.onChanged(region);
-        }
-      });
-    }
-  }
-
-  _loadRegionList() async {
-    late final List<Region> list;
-    if (widget._isString) {
-      list = await Parser.instance.svgToRegionListString(widget.svgData);
-    } else {
-      list = await Parser.instance.svgToRegionList(widget.svgData);
-    }
-
-    _regionList.clear();
-    setState(() {
-      _regionList.addAll(list);
-      mapSize = _sizeController.mapSize;
-    });
-  }
-
-  Widget _buildStackItem(Region region) {
-    return GestureDetector(
-      behavior: HitTestBehavior.deferToChild,
-      onTap: () => (widget.toggleEnable ?? false) ? toggleButton(region) : holdButton(region),
-      child: CustomPaint(
-        isComplex: true,
-        foregroundPainter: RegionPainter(
-          region: region,
-          selectedRegions: selectedRegion,
-          dotColor: widget.dotColor,
-          selectedColor: widget.selectedColor,
-          strokeColor: widget.strokeColor,
-          centerDotEnable: widget.centerDotEnable,
-          centerTextEnable: widget.centerTextEnable,
-          textStyle: widget.centerTextStyle,
-          strokeWidth: widget.strokeWidth,
-          boxColor: widget.regionColors?[region.className],
-          unSelectableId: widget.unSelectableId,
-        ),
-        child: Container(
-          width: widget.width ?? double.infinity,
-          height: widget.height ?? double.infinity,
-          constraints: BoxConstraints(maxWidth: mapSize?.width ?? 0, maxHeight: mapSize?.height ?? 0),
-          alignment: Alignment.center,
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        for (final region in _regionList) _buildStackItem(region),
+        for (final region in _regionList)
+          _RegionWidget(
+            themeData: widget.themeData,
+            centerDotEnable: widget.centerDotEnable,
+            centerTextEnable: widget.centerTextEnable,
+            height: widget.height,
+            width: widget.width,
+            gestureDetectorData: widget.gestureDetectorData ?? (region) => const GestureDetectorData.empty(),
+            region: region,
+            mapSize: _mapSize,
+            regionColor: widget.regionColors?[region.className],
+            unSelectableId: widget.unSelectableId,
+            onSelected: toggleButton,
+            isSelected: _selectedRegions.contains(region),
+          ),
       ],
+    );
+  }
+}
+
+class _RegionWidget extends StatelessWidget {
+  final InteractiveSvgThemeData themeData;
+  final bool centerDotEnable;
+  final bool centerTextEnable;
+  final double height;
+  final double width;
+  final GestureDetectorData Function(Region region) gestureDetectorData;
+  final Color? regionColor;
+  final String? unSelectableId;
+  final void Function(Region region) onSelected;
+  final bool isSelected;
+  final Region region;
+  final Size mapSize;
+  const _RegionWidget({
+    required this.themeData,
+    required this.centerDotEnable,
+    required this.centerTextEnable,
+    required this.height,
+    required this.width,
+    required this.gestureDetectorData,
+    required this.region,
+    required this.mapSize,
+    required this.onSelected,
+    required this.isSelected,
+    Key? key,
+    this.regionColor,
+    this.unSelectableId,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return gestureDetectorData(region).build(
+      onTap: () => onSelected(region),
+      child: CustomPaint(
+        isComplex: true,
+        willChange: true,
+        painter: ColorRegionPainter(
+          unSelectableId: unSelectableId,
+          region: region,
+          isSelected: isSelected,
+          boxColor: regionColor,
+          themeData: themeData,
+        ),
+        child: CustomPaint(
+          isComplex: false,
+          willChange: false,
+          foregroundPainter: RegionPainter(
+            region: region,
+            themeData: themeData,
+            centerDotEnable: centerDotEnable,
+            centerTextEnable: centerTextEnable,
+            unSelectableId: unSelectableId,
+          ),
+          child: Container(
+            width: width,
+            height: height,
+            constraints: BoxConstraints(maxWidth: mapSize.width, maxHeight: mapSize.height),
+            alignment: Alignment.center,
+          ),
+        ),
+      ),
     );
   }
 }

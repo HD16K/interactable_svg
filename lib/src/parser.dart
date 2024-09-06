@@ -1,29 +1,23 @@
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:svg_path_parser/svg_path_parser.dart';
 
-import 'size_controller.dart';
 import 'constant.dart';
 import 'models/region.dart';
+import 'size_controller.dart';
 
 class Parser {
-  static Parser? _instance;
-
-  static Parser get instance {
-    _instance ??= Parser._init();
-    return _instance!;
-  }
+  static final Parser _singleton = Parser._init();
+  factory Parser.instance() => _singleton;
+  Parser._init();
 
   final sizeController = SizeController.instance();
-
-  Parser._init();
 
   Future<List<Region>> svgToRegionList(String svgAddress) async {
     final svgMain = await rootBundle.loadString(svgAddress);
 
-    List<Region> regionList = [];
+    final List<Region> regionList = [];
 
-    final regExp = RegExp(Constants.mapRegexp,
-        multiLine: true, caseSensitive: false, dotAll: false);
+    final regExp = RegExp(mapRegexp, multiLine: true, caseSensitive: false, dotAll: false);
 
     regExp.allMatches(svgMain).forEach((regionData) {
       final region = Region(
@@ -31,7 +25,7 @@ class Parser {
           name: regionData.group(2)!,
           className: regionData.group(3),
           path: parseSvgPath(regionData.group(4)!));
-
+      //log(region.path.getBounds().toString());
       sizeController.addBounds(region.path.getBounds());
       regionList.add(region);
     });
@@ -41,10 +35,9 @@ class Parser {
   List<Region> svgToRegionListString(String svgAddress) {
     final svgMain = svgAddress;
 
-    List<Region> regionList = [];
+    final List<Region> regionList = [];
 
-    final regExp = RegExp(Constants.mapRegexp,
-        multiLine: true, caseSensitive: false, dotAll: false);
+    final regExp = RegExp(mapRegexp, multiLine: true, caseSensitive: false, dotAll: false);
     regExp.allMatches(svgMain).forEach((regionData) {
       final region = Region(
           id: regionData.group(1)!,
@@ -57,5 +50,4 @@ class Parser {
     });
     return regionList;
   }
-
 }

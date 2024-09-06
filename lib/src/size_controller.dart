@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'models/region_area.dart';
+import './models/region_area.dart';
 
 class SizeController {
   static final SizeController _singleton = SizeController._init();
@@ -26,10 +26,13 @@ class SizeController {
   }
 
   void calculateArea() {
-    if (_regionArea.anyEmpty) mapSize = Size.zero;
+    if (_regionArea.anyEmpty) {
+      mapSize = Size.zero;
+      return;
+    }
 
-    double width = _regionArea.maxX! - _regionArea.minX!;
-    double height = _regionArea.maxY! - _regionArea.minY!;
+    final double width = _regionArea.maxX! - _regionArea.minX!;
+    final double height = _regionArea.maxY! - _regionArea.minY!;
 
     mapSize = Size(width, height);
   }
@@ -49,9 +52,9 @@ class SizeController {
     containerSize = Size(newWidth, newHeight);
 
     // Scale for Responsive UI
-    double scale1 = containerSize.width / mapSize.width;
-    double scale2 = containerSize.height / mapSize.height;
-    double mapScale = scale1 > scale2 ? scale1 : scale2;
+    final double scale1 = containerSize.width / mapSize.width;
+    final double scale2 = containerSize.height / mapSize.height;
+    final double mapScale = scale1 > scale2 ? scale1 : scale2;
 
     return mapScale;
   }
