@@ -65,9 +65,9 @@ By rendering SVG from asset folder:
             ),
 ```
 
-![How package work example.mp4](https://github.com/HD16K/interactable_svg/tree/main/doc/example.mp4)
+https://github.com/user-attachments/assets/f13ef28f-859d-4e91-b250-681d676f14c0
 
-String usage (rendering SVG from a String):
+or by using string:
 
 ```dart
           InteractiveSVGWidget.string(
@@ -100,8 +100,6 @@ Also your SVG must follow the following pattern. For better understanding see th
 
 for example:
   \<path id="<mark>118</mark>" name="<mark>room 9</mark>" class="<mark>st0</mark>" d="<mark>M55 508h101.26v330H55Z</mark>" />;
-
----
 
 ## Contributing
 
